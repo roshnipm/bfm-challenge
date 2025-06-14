@@ -1,0 +1,160 @@
+{
+    "model_name": "Andrii's model (M_nst8_dm192_nh12_nl5_5_eaM_projN_eeL_fb1_cls_lr0.003_rCONT_EXP_CLS1_epoch100)",
+    "author": "Andrii Zahorodnii",
+    "description": "Linear regression on top of the output of the transformer model.",
+    "organization": "MIT",
+    "organization_url": "https://azaho.org/",
+    "timestamp": 1749869942.626862,
+    "evaluation_results": {
+        "btbank2_6": {
+            "population": {
+                "one_second_after_onset": {
+                    "time_bin_start": 0.0,
+                    "time_bin_end": 1.0,
+                    "folds": [
+                        {
+                            "test_accuracy": 0.8296296296296296,
+                            "test_roc_auc": 0.9004229381081176
+                        },
+                        {
+                            "test_accuracy": 0.8203703703703704,
+                            "test_roc_auc": 0.8981773898835146
+                        },
+                        {
+                            "test_accuracy": 0.825925925925926,
+                            "test_roc_auc": 0.899645493808628
+                        },
+                        {
+                            "test_accuracy": 0.8362962962962963,
+                            "test_roc_auc": 0.9060829058595421
+                        },
+                        {
+                            "test_accuracy": 0.8340740740740741,
+                            "test_roc_auc": 0.9035035133948178
+                        }
+                    ]
+                }
+            }
+        },
+        "btbank1_2": {
+            "population": {
+                "one_second_after_onset": {
+                    "time_bin_start": 0.0,
+                    "time_bin_end": 1.0,
+                    "folds": [
+                        {
+                            "test_accuracy": 0.9169899146625291,
+                            "test_roc_auc": 0.9699553038184411
+                        },
+                        {
+                            "test_accuracy": 0.9255236617532971,
+                            "test_roc_auc": 0.9763951287866749
+                        },
+                        {
+                            "test_accuracy": 0.9169254658385093,
+                            "test_roc_auc": 0.9747325954826551
+                        },
+                        {
+                            "test_accuracy": 0.9285714285714286,
+                            "test_roc_auc": 0.9778659367425933
+                        },
+                        {
+                            "test_accuracy": 0.9293478260869565,
+                            "test_roc_auc": 0.9788682121185811
+                        }
+                    ]
+                }
+            }
+        },
+        "btbank7_0": {
+            "population": {
+                "one_second_after_onset": {
+                    "time_bin_start": 0.0,
+                    "time_bin_end": 1.0,
+                    "folds": [
+                        {
+                            "test_accuracy": 0.714527027027027,
+                            "test_roc_auc": 0.7829885530664289
+                        },
+                        {
+                            "test_accuracy": 0.7055837563451777,
+                            "test_roc_auc": 0.7875286303252405
+                        },
+                        {
+                            "test_accuracy": 0.7225042301184433,
+                            "test_roc_auc": 0.7987253100597153
+                        },
+                        {
+                            "test_accuracy": 0.7140439932318104,
+                            "test_roc_auc": 0.7841125134571777
+                        },
+                        {
+                            "test_accuracy": 0.7089678510998308,
+                            "test_roc_auc": 0.7688624126474969
+                        }
+                    ]
+                }
+            }
+        },
+        "btbank10_0": {
+            "population": {
+                "one_second_after_onset": {
+                    "time_bin_start": 0.0,
+                    "time_bin_end": 1.0,
+                    "folds": [
+                        {
+                            "test_accuracy": 0.7591933570581257,
+                            "test_roc_auc": 0.8325283435223654
+                        },
+                        {
+                            "test_accuracy": 0.7473309608540926,
+                            "test_roc_auc": 0.822383920821544
+                        },
+                        {
+                            "test_accuracy": 0.7568208778173191,
+                            "test_roc_auc": 0.8417210997168353
+                        },
+                        {
+                            "test_accuracy": 0.7995255041518387,
+                            "test_roc_auc": 0.8722968333126948
+                        },
+                        {
+                            "test_accuracy": 0.7826603325415677,
+                            "test_roc_auc": 0.8685511171293162
+                        }
+                    ]
+                }
+            }
+        },
+        "btbank3_0": {
+            "population": {
+                "one_second_after_onset": {
+                    "time_bin_start": 0.0,
+                    "time_bin_end": 1.0,
+                    "folds": [
+                        {
+                            "test_accuracy": 0.9407313997477932,
+                            "test_roc_auc": 0.9855036511207795
+                        },
+                        {
+                            "test_accuracy": 0.9394703656998739,
+                            "test_roc_auc": 0.9762839301643941
+                        },
+                        {
+                            "test_accuracy": 0.9634300126103404,
+                            "test_roc_auc": 0.988648222148693
+                        },
+                        {
+                            "test_accuracy": 0.9306431273644389,
+                            "test_roc_auc": 0.9830102027835026
+                        },
+                        {
+                            "test_accuracy": 0.9545454545454546,
+                            "test_roc_auc": 0.9840558905158387
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
