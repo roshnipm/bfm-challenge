@@ -99,7 +99,8 @@ for eval_name in eval_names:
     }
 
     # Create KFold cross-validator
-    kf = KFold(n_splits=n_splits, shuffle=False, random_state=42)
+    # kf = KFold(n_splits=n_splits, shuffle=False, random_state=42)
+    kf = KFold(n_splits=n_splits, shuffle=False)
 
     # Loop over all folds
     for fold_idx, (train_idx, test_idx) in enumerate(kf.split(X_all_bins)):
@@ -119,14 +120,25 @@ for eval_name in eval_names:
         # WHen doing the regression, rescale the features first (normalize)
         # Then train the logistic regression
         # Then fill out the values below 
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
 
-        # Evaluate model
-        train_accuracy = None  #XXX
-        test_accuracy = None  #XXX
+        # Train logistic regression
+        clf = LogisticRegression(random_state=42)
+        clf.fit(X_train_scaled, y_train)
 
-        # this is the AUROC (AUC ROC) of the decoder
-        train_roc = None  #XXX
-        test_roc = None  #XXX
+        # Get predictions
+        y_train_pred = clf.predict(X_train_scaled)
+        y_test_pred = clf.predict(X_test_scaled)
+        y_train_prob = clf.predict_proba(X_train_scaled)[:, 1]
+        y_test_prob = clf.predict_proba(X_test_scaled)[:, 1]
+
+        # Calculate metrics
+        train_accuracy = (y_train_pred == y_train).mean()
+        test_accuracy = (y_test_pred == y_test).mean()
+        train_roc = roc_auc_score(y_train, y_train_prob)
+        test_roc = roc_auc_score(y_test, y_test_prob)
         
         fold_result = {
             "train_accuracy": float(train_accuracy),
