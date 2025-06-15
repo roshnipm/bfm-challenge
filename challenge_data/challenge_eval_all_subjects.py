@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # a
 
 """
 Evaluates model performance on population-level data one second after word onset.
-Processes all available subject/trial pairs and accumulates results in a single file per evaluation type.
+Processes all available subject/trial pairs and accumulates results in a single file per evaluation type per model.
 
 Parameters
 ----------
@@ -66,7 +66,7 @@ n_splits = args.n_splits
 bins_start_before_word_onset_seconds = 0.5
 bins_end_after_word_onset_seconds = 2.5
 
-# Putting all results in a single file, description at the top
+# Moving here for addition to each file
 all_results = {}
 for eval_name in eval_names:
     all_results[eval_name] = {
@@ -82,7 +82,7 @@ for eval_name in eval_names:
 # Get all available feature files for this model and epoch
 model_features_dir = os.path.join(features_dir, model_dir+f"_epoch{model_epoch}")
 
-# Find all subject/trial pairs
+# Find all subject/trial pairs --> to iterate through for each model
 subject_trial_pairs = []
 for filename in os.listdir(model_features_dir):
     parts = filename.replace("frozen_population_btbank", "").replace(".npy", "").split("_")
@@ -90,9 +90,7 @@ for filename in os.listdir(model_features_dir):
     trial = parts[1]
     subject_trial_pairs.append((subject, trial))
 
-if verbose:
-    print(f"Found {len(subject_trial_pairs)} subject/trial pairs to process")
-
+# now going through each eval_name
 for eval_name in eval_names:
     # Create epoch-specific directory
     epoch_dir = os.path.join(save_dir, f"epoch{model_epoch}")
@@ -106,14 +104,9 @@ for eval_name in eval_names:
     # Going through every subject/trial pair
     for subject_id, trial_id in subject_trial_pairs:
         features_file_path = os.path.join(model_features_dir, f"frozen_population_btbank{subject_id}_{trial_id}_{eval_name}.npy")
-        
-        if not os.path.exists(features_file_path):
-            if verbose:
-                print(f"Features file not found: {features_file_path}, skipping...")
-            continue
 
         if verbose:
-            print(f"\nProcessing subject {subject_id} trial {trial_id} for {eval_name}...")
+            print(f"\nSubject: {subject_id}, Trial: {trial_id}, Eval: {eval_name}...")
 
         # Load pre-computed features
         features_dict = np.load(features_file_path, allow_pickle=True).item()
@@ -129,9 +122,9 @@ for eval_name in eval_names:
         }
 
         # Create KFold cross-validator
-        # changed to 4 for speaker due to issues with class imbalance
+        # changed to 4 for speaker due to issues/error with class imbalance
         if eval_name == 'speaker':
-            kf = KFold(n_splits=4, shuffle=False)
+            kf = KFold(n_splits=n_splits-1, shuffle=False) # -1 b/c speaker has 4 classes
         else:
             kf = KFold(n_splits=n_splits, shuffle=False)
 
@@ -156,18 +149,18 @@ for eval_name in eval_names:
             X_test_scaled = scaler.transform(X_test)
 
             # Train logistic regression
+            # Multi-class classification for speaker
             if eval_name == 'speaker':
-                # Multi-class classification for speaker
                 clf = LogisticRegression(random_state=42)
                 clf.fit(X_train_scaled, y_train)
                 y_test_pred = clf.predict(X_test_scaled)
                 y_test_prob = clf.predict_proba(X_test_scaled)
-                # Binarize the labels
+                # Binarize labels for multi-class classification
                 y_test_bin = label_binarize(y_test, classes=np.unique(y_train))
                 test_roc = roc_auc_score(y_test_bin, y_test_prob)
                 # was checking if auc is sensitive to shuffling, which it was (came down to 0.5)
                 # print(f"shuffled auc: {roc_auc_score(label_binarize(y_test, classes=np.unique(y_train)), clf.predict_proba(X_test_scaled[np.random.permutation(len(X_test_scaled))]))}")
-                
+            # same code as before    
             else:
                 # Binary classification for onset, speech, volume
                 # Train logistic regression
@@ -185,22 +178,23 @@ for eval_name in eval_names:
             fold_result = {
                 "test_accuracy": float(test_accuracy),
                 "test_roc_auc": float(test_roc),
+                # added weights for decoder similarity analysis in task 2
                 "weights": clf.coef_.flatten().tolist()
             }
 
             results_population["one_second_after_onset"]["folds"].append(fold_result)
             
             if verbose:
-                print(f"Subject {subject_id} trial {trial_id}, Fold {fold_idx+1}, Test accuracy: {test_accuracy:.3f}, Test ROC AUC: {test_roc:.3f}")
+                print(f"Subject {subject_id}, Trial {trial_id}, Fold {fold_idx+1}, Test accuracy: {test_accuracy:.3f}, Test ROC AUC: {test_roc:.3f}")
 
-        # Add this subject/trial's results to the overall results
+        # Add this subject/trial's results to overall results
         all_results[eval_name]["evaluation_results"][f"btbank{subject_id}_{trial_id}"] = {
             "population": results_population
         }
 
-        # Save the accumulated results after each subject/trial
+        # Save accumulated results after each subject/trial
         os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
         with open(save_file_path, "w") as f:
             json.dump(all_results[eval_name], f, indent=4)
         if verbose:
-            print(f"Updated results saved to {save_file_path}\n\n") 
+            print(f"Saved to {save_file_path}\n\n") 

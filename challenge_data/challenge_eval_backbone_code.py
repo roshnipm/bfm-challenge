@@ -131,10 +131,12 @@ for eval_name in eval_names:
         # Get predictions
         y_train_pred = clf.predict(X_train_scaled)
         y_test_pred = clf.predict(X_test_scaled)
+        # used 1st index b/c binary classification and this is true class
         y_train_prob = clf.predict_proba(X_train_scaled)[:, 1]
         y_test_prob = clf.predict_proba(X_test_scaled)[:, 1]
 
         # Calculate metrics
+        # added some train metrics as well just in case
         train_accuracy = (y_train_pred == y_train).mean()
         test_accuracy = (y_test_pred == y_test).mean()
         train_roc = roc_auc_score(y_train, y_train_prob)
