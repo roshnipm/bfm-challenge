@@ -102,13 +102,15 @@ def plot_metric(metric_dict, metric_name, eval_label, ax=None):
         for g in groups
     ]
     
-    fig = None
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(5, 4))
+    else:
+        fig = ax.get_figure()  # get figure from the provided axis
     
     ax.bar(groups, means, yerr=sems, capsize=5, color=bar_colors)
     ax.set_ylabel(metric_name, fontsize=12)
     ax.set_title(f"{metric_name}\n{eval_label}", fontsize=12)
     
-    fig.tight_layout()
     return fig
 
 def main():

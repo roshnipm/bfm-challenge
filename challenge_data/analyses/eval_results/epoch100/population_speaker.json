@@ -4,7 +4,7 @@
     "description": "Linear regression on top of the output of the transformer model.",
     "organization": "MIT",
     "organization_url": "https://azaho.org/",
-    "timestamp": 1749949038.9491682,
+    "timestamp": 1749958529.598793,
     "evaluation_results": {
         "btbank2_6": {
             "population": {

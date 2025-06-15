@@ -44,14 +44,16 @@ for eval_idx, eval_type in enumerate(eval_types):
         # load results
         with open(json_path, "r") as f:
             results = json.load(f)
-        # for each subject/trial pair, average across folds as listed in challenge description
+        
+        # for each subject/trial pair, average across folds
         for subj_trial, res in results["evaluation_results"].items():
             # retrieving folds
             folds = res["population"]["one_second_after_onset"]["folds"]
             # retrieving aurocs
             fold_aurocs = [fold["test_roc_auc"] for fold in folds if fold["test_roc_auc"] is not None and not np.isnan(fold["test_roc_auc"])]
-            subj_trial_mean = np.mean(fold_aurocs)
-            auroc_data[eval_type][bar_idx].append(subj_trial_mean)
+            if fold_aurocs:  # only append if we have valid AUROCs
+                subj_trial_mean = np.mean(fold_aurocs)
+                auroc_data[eval_type][bar_idx].append(subj_trial_mean)
 
 # Compute means + SEMs across subject/trials
 means = []
