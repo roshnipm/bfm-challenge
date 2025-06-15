@@ -4,7 +4,7 @@
     "description": "Linear regression on top of the output of the transformer model.",
     "organization": "MIT",
     "organization_url": "https://azaho.org/",
-    "timestamp": 1749869708.3997598,
+    "timestamp": 1749872503.2644532,
     "evaluation_results": {
         "btbank2_6": {
             "population": {
@@ -13,24 +13,20 @@
                     "time_bin_end": 1.0,
                     "folds": [
                         {
-                            "test_accuracy": 0.32375,
-                            "test_roc_auc": 0.5935387925143316
+                            "test_accuracy": 0.191,
+                            "test_roc_auc": 0.48822926531444427
                         },
                         {
-                            "test_accuracy": 0.31,
-                            "test_roc_auc": 0.5770170823480563
+                            "test_accuracy": 0.197,
+                            "test_roc_auc": 0.5025993933434061
                         },
                         {
-                            "test_accuracy": 0.33,
-                            "test_roc_auc": 0.6084358236976104
+                            "test_accuracy": 0.191,
+                            "test_roc_auc": 0.5024794695821561
                         },
                         {
-                            "test_accuracy": 0.33,
-                            "test_roc_auc": 0.5915569208367013
-                        },
-                        {
-                            "test_accuracy": 0.305,
-                            "test_roc_auc": 0.5755850871113573
+                            "test_accuracy": 0.246,
+                            "test_roc_auc": 0.4948759232842629
                         }
                     ]
                 }
@@ -43,24 +39,20 @@
                     "time_bin_end": 1.0,
                     "folds": [
                         {
-                            "test_accuracy": 0.3185328185328185,
-                            "test_roc_auc": 0.6067525320535037
+                            "test_accuracy": 0.21638330757341576,
+                            "test_roc_auc": 0.47355862994963516
                         },
                         {
-                            "test_accuracy": 0.3301158301158301,
-                            "test_roc_auc": 0.5987618869496482
+                            "test_accuracy": 0.20865533230293662,
+                            "test_roc_auc": 0.4489344215020871
                         },
                         {
-                            "test_accuracy": 0.3590733590733591,
-                            "test_roc_auc": 0.6010970026296005
+                            "test_accuracy": 0.21483771251931993,
+                            "test_roc_auc": 0.5069630877365556
                         },
                         {
-                            "test_accuracy": 0.29593810444874274,
-                            "test_roc_auc": 0.5908860981907871
-                        },
-                        {
-                            "test_accuracy": 0.3365570599613153,
-                            "test_roc_auc": 0.6164863742744479
+                            "test_accuracy": 0.20556414219474498,
+                            "test_roc_auc": 0.5690210842190568
                         }
                     ]
                 }
@@ -73,24 +65,20 @@
                     "time_bin_end": 1.0,
                     "folds": [
                         {
-                            "test_accuracy": 0.28978622327790976,
-                            "test_roc_auc": 0.5419885546402838
+                            "test_accuracy": 0.23574144486692014,
+                            "test_roc_auc": 0.5186450097856303
                         },
                         {
-                            "test_accuracy": 0.28741092636579574,
-                            "test_roc_auc": 0.5550010395370153
+                            "test_accuracy": 0.2633079847908745,
+                            "test_roc_auc": 0.5049560913594013
                         },
                         {
-                            "test_accuracy": 0.30403800475059384,
-                            "test_roc_auc": 0.5552629614077025
+                            "test_accuracy": 0.25285171102661597,
+                            "test_roc_auc": 0.5208687765960344
                         },
                         {
-                            "test_accuracy": 0.2853745541022592,
-                            "test_roc_auc": 0.5486392236160534
-                        },
-                        {
-                            "test_accuracy": 0.30677764565992865,
-                            "test_roc_auc": 0.5616052339797273
+                            "test_accuracy": 0.23574144486692014,
+                            "test_roc_auc": 0.4885039763340908
                         }
                     ]
                 }
@@ -103,24 +91,20 @@
                     "time_bin_end": 1.0,
                     "folds": [
                         {
-                            "test_accuracy": 0.36538461538461536,
-                            "test_roc_auc": 0.6257477665209263
+                            "test_accuracy": 0.24142011834319527,
+                            "test_roc_auc": 0.48686465911571297
                         },
                         {
-                            "test_accuracy": 0.3431952662721893,
-                            "test_roc_auc": 0.6265707773462987
+                            "test_accuracy": 0.22366863905325443,
+                            "test_roc_auc": 0.4758109317871583
                         },
                         {
-                            "test_accuracy": 0.3609467455621302,
-                            "test_roc_auc": 0.6143713328669695
+                            "test_accuracy": 0.2272189349112426,
+                            "test_roc_auc": 0.46753137128377803
                         },
                         {
-                            "test_accuracy": 0.371301775147929,
-                            "test_roc_auc": 0.6345198313251055
-                        },
-                        {
-                            "test_accuracy": 0.3239644970414201,
-                            "test_roc_auc": 0.6020345658437025
+                            "test_accuracy": 0.25443786982248523,
+                            "test_roc_auc": 0.5106390067431216
                         }
                     ]
                 }
@@ -133,24 +117,20 @@
                     "time_bin_end": 1.0,
                     "folds": [
                         {
-                            "test_accuracy": 0.25653206650831356,
-                            "test_roc_auc": 0.5318925460027228
+                            "test_accuracy": 0.18631178707224336,
+                            "test_roc_auc": 0.48140907876844985
                         },
                         {
-                            "test_accuracy": 0.26247030878859856,
-                            "test_roc_auc": 0.5221265637185614
+                            "test_accuracy": 0.21007604562737642,
+                            "test_roc_auc": 0.5109940911315236
                         },
                         {
-                            "test_accuracy": 0.27909738717339666,
-                            "test_roc_auc": 0.535346167327744
+                            "test_accuracy": 0.2338403041825095,
+                            "test_roc_auc": 0.5125260899863648
                         },
                         {
-                            "test_accuracy": 0.2556480380499406,
-                            "test_roc_auc": 0.5217596383518365
-                        },
-                        {
-                            "test_accuracy": 0.27586206896551724,
-                            "test_roc_auc": 0.5369031974181775
+                            "test_accuracy": 0.23669201520912547,
+                            "test_roc_auc": 0.4910020702343435
                         }
                     ]
                 }
