@@ -16,19 +16,15 @@ from scipy.stats import pearsonr
 from sklearn.metrics.pairwise import cosine_similarity
 from matplotlib.backends.backend_pdf import PdfPages
 
+from decoding import MOVIE_BY_SUBJECT_TRIAL, TASKS
+
 # configuration
 results_dir = "analyses/eval_results/epoch100"
-eval_types = ["onset", "speech", "volume", "speaker"]
+eval_types = TASKS
 eval_labels = ["Sentence Onset", "Speech", "Audio Volume", "Speaker Identity"]
 
 # noted slightly different from before
-movie_map = {
-    "btbank1_2": "Thor: Ragnarok",
-    "btbank2_6": "Aquaman",
-    "btbank3_0": "Cars 2",
-    "btbank7_0": "Cars 2",
-    "btbank10_0": "Cars 2",
-}
+movie_map = {f"btbank{subject_trial}": movie for subject_trial, movie in MOVIE_BY_SUBJECT_TRIAL.items()}
 bar_colors = ["#355C8D", "#2CA6A4"]  # blue, teal
 
 # load weights from results file
@@ -117,7 +113,6 @@ def main():
     all_results = {}
     pearson_metrics = []
     cosine_metrics = []
-    eval_labels_used = []
     
     # Process each evaluation type
     for eval_type, eval_label in zip(eval_types, eval_labels):
@@ -131,14 +126,14 @@ def main():
         all_results[eval_type] = {"pearson": pearson, "cosine": cosine}
         pearson_metrics.append((pearson, eval_label))
         cosine_metrics.append((cosine, eval_label))
-        eval_labels_used.append(eval_label)
         
         # Save individual task results
         with open(f"analyses/eval_results/weights/weight_similarity_{eval_type}.json", "w") as f:
             json.dump({"pearson": pearson, "cosine": cosine}, f, indent=2)
     
     # Create composite PDF with all plots
-    with PdfPages("weight_similarity_alltasks.pdf") as pdf:
+    os.makedirs("figures", exist_ok=True)
+    with PdfPages("figures/weight_similarity_alltasks.pdf") as pdf:
         num_tasks = len(pearson_metrics)
         fig, axs = plt.subplots(nrows=2, ncols=num_tasks, figsize=(5 * num_tasks, 8))
         

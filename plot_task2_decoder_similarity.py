@@ -8,11 +8,12 @@ This script creates a bar plot showing AUROC scores for three conditions:
 """
 
 import json
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 # load results as stored from challenge_eval_task2.py
-with open("task2_decoder_similarity_results.json", "r") as f:
+with open("analyses/eval_results/task2_decoder_similarity_results.json", "r") as f:
     results = json.load(f)
 
 # extract data from results
@@ -50,5 +51,6 @@ for idx, task in enumerate(tasks):
 
 # save plots
 plt.tight_layout()
-plt.savefig('task2_decoder_similarity_alltasks.pdf')
+os.makedirs("figures", exist_ok=True)
+plt.savefig('figures/task2_decoder_similarity_alltasks.pdf')
 plt.show()

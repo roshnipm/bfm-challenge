@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) # add parent directory to path
-
 """
 Evaluates model performance on population-level data one second after word onset.
 Processes all available subject/trial pairs and accumulates results in a single file per evaluation type per model.
@@ -33,13 +29,10 @@ None
     Saves evaluation results as JSON files in the specified save_dir
 """
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import KFold
-import numpy as np
 import argparse, json, os, time
-from sklearn.preprocessing import label_binarize # added for speaker classification
+import numpy as np
+
+from decoding import auroc, discover_subject_trials, feature_path, fit_decoder, load_features, make_kfold, population_features
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--eval_names', type=str, default='onset', help='Evaluation names list, separated by commas')
@@ -63,9 +56,6 @@ timebins_aggregation = args.timebins_aggregation
 overwrite = bool(args.overwrite)
 n_splits = args.n_splits
 
-bins_start_before_word_onset_seconds = 0.5
-bins_end_after_word_onset_seconds = 2.5
-
 # Moving here for addition to each file
 all_results = {}
 for eval_name in eval_names:
@@ -83,12 +73,7 @@ for eval_name in eval_names:
 model_features_dir = os.path.join(features_dir, model_dir+f"_epoch{model_epoch}")
 
 # Find all subject/trial pairs --> to iterate through for each model
-subject_trial_pairs = []
-for filename in os.listdir(model_features_dir):
-    parts = filename.replace("frozen_population_btbank", "").replace(".npy", "").split("_")
-    subject = parts[0]
-    trial = parts[1]
-    subject_trial_pairs.append((subject, trial))
+subject_trial_pairs = discover_subject_trials(model_features_dir)
 
 # now going through each eval_name
 for eval_name in eval_names:
@@ -103,15 +88,13 @@ for eval_name in eval_names:
 
     # Going through every subject/trial pair
     for subject_id, trial_id in subject_trial_pairs:
-        features_file_path = os.path.join(model_features_dir, f"frozen_population_btbank{subject_id}_{trial_id}_{eval_name}.npy")
+        features_file_path = feature_path(model_features_dir, subject_id, trial_id, eval_name)
 
         if verbose:
             print(f"\nSubject: {subject_id}, Trial: {trial_id}, Eval: {eval_name}...")
 
         # Load pre-computed features
-        features_dict = np.load(features_file_path, allow_pickle=True).item()
-        X_all_bins = features_dict['X']  # shape: (n_samples, n_timebins, 1, d_model)
-        y = features_dict['y']
+        X_all_bins, y = load_features(features_file_path)  # shape: (n_samples, n_timebins, 1, d_model)
 
         results_population = {
             "one_second_after_onset": {
@@ -123,10 +106,7 @@ for eval_name in eval_names:
 
         # Create KFold cross-validator
         # changed to 4 for speaker due to issues/error with class imbalance
-        if eval_name == 'speaker':
-            kf = KFold(n_splits=n_splits-1, shuffle=False) # -1 b/c speaker has 4 classes
-        else:
-            kf = KFold(n_splits=n_splits, shuffle=False)
+        kf = make_kfold(eval_name, n_splits) # -1 b/c speaker has 4 classes
 
         # Loop over all folds
         for fold_idx, (train_idx, test_idx) in enumerate(kf.split(X_all_bins)):
@@ -136,41 +116,24 @@ for eval_name in eval_names:
             y_test = y[test_idx]
 
             # Get one second after onset (bins 4-12, given that each bin is 0.125 seconds and they start at -0.5 seconds)
-            if timebins_aggregation == "concat":
-                X_train = X_train_all_bins[:, 4:12, 0, :].reshape(len(train_idx), -1)
-                X_test = X_test_all_bins[:, 4:12, 0, :].reshape(len(test_idx), -1)
-            elif timebins_aggregation == "mean":
-                X_train = X_train_all_bins[:, 4:12, 0, :].mean(axis=1)
-                X_test = X_test_all_bins[:, 4:12, 0, :].mean(axis=1)
+            X_train = population_features(X_train_all_bins, timebins_aggregation)
+            X_test = population_features(X_test_all_bins, timebins_aggregation)
 
             # Scale features
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-
             # Train logistic regression
+            clf, X_test_scaled = fit_decoder(X_train, y_train, X_test)
+
             # Multi-class classification for speaker
             if eval_name == 'speaker':
-                clf = LogisticRegression(random_state=42)
-                clf.fit(X_train_scaled, y_train)
                 y_test_pred = clf.predict(X_test_scaled)
-                y_test_prob = clf.predict_proba(X_test_scaled)
                 # Binarize labels for multi-class classification
-                y_test_bin = label_binarize(y_test, classes=np.unique(y_train))
-                test_roc = roc_auc_score(y_test_bin, y_test_prob)
-                # was checking if auc is sensitive to shuffling, which it was (came down to 0.5)
-                # print(f"shuffled auc: {roc_auc_score(label_binarize(y_test, classes=np.unique(y_train)), clf.predict_proba(X_test_scaled[np.random.permutation(len(X_test_scaled))]))}")
+                test_roc = auroc(clf, X_test_scaled, y_test, eval_name, classes=np.unique(y_train))
             # same code as before    
             else:
                 # Binary classification for onset, speech, volume
                 # Train logistic regression
-                clf = LogisticRegression(random_state=42)
-                clf.fit(X_train_scaled, y_train)
-
-                # Get predictions
                 y_test_pred = clf.predict(X_test_scaled)
-                y_test_prob = clf.predict_proba(X_test_scaled)[:, 1]
-                test_roc = roc_auc_score(y_test, y_test_prob)
+                test_roc = auroc(clf, X_test_scaled, y_test, eval_name)
 
             # Calculate metrics
             test_accuracy = (y_test_pred == y_test).mean()
@@ -191,10 +154,9 @@ for eval_name in eval_names:
         all_results[eval_name]["evaluation_results"][f"btbank{subject_id}_{trial_id}"] = {
             "population": results_population
         }
-
         # Save accumulated results after each subject/trial
         os.makedirs(os.path.dirname(save_file_path), exist_ok=True)
         with open(save_file_path, "w") as f:
             json.dump(all_results[eval_name], f, indent=4)
         if verbose:
-            print(f"Saved to {save_file_path}\n\n") 
+            print(f"Saved to {save_file_path}\n\n")

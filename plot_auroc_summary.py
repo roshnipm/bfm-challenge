@@ -3,6 +3,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+from decoding import mean_sem, overall_mean_sem
+
 # labels for all features of the plot
 bar_labels = [
     "Linear (raw voltage)",
@@ -36,7 +38,7 @@ file_patterns = [
 auroc_data = {eval_type: [[] for _ in range(len(bar_labels))] for eval_type in eval_types}
 
 # going through each evaluation type
-for eval_idx, eval_type in enumerate(eval_types):
+for eval_type in eval_types:
     # going through each model (bar in plot)
     for bar_idx, file_pattern in enumerate(file_patterns):
         # format the file path for the current eval_type
@@ -67,8 +69,9 @@ for eval_type in eval_types:
         vals = auroc_data[eval_type][bar_idx]
         # appending mean and sem for each bar/model
         # taking mean after done across folds previously
-        m.append(np.mean(vals))
-        s.append(np.std(vals) / np.sqrt(len(vals)))
+        mean, sem = mean_sem(vals)
+        m.append(mean)
+        s.append(sem)
 
     means.append(m)
     sems.append(s)
@@ -78,12 +81,10 @@ means = np.array(means)
 sems = np.array(sems)
 
 # Overall (mean of the four evaluation type means for each bar)
-overall_means = np.nanmean(means, axis=0)
-overall_sems = np.sqrt(np.nansum(sems**2, axis=0)) / 4
+overall_means, overall_sems = overall_mean_sem(means, sems)
 
 # Plot
 fig, axes = plt.subplots(1, len(eval_types)+1, figsize=(14, 4), sharey=True) # +1 for overall graph
-x = np.arange(len(bar_labels))
 
 # Overall panel
 bar_handles = []
@@ -112,6 +113,7 @@ plt.tight_layout(rect=[0, 0.07, 1, 1])  # leave space at bottom for legend
 fig.legend(bar_handles, bar_labels, loc='lower center', bbox_to_anchor=(0.5, -0.05), ncol=len(bar_labels), frameon=False)
 
 # save to PDF
-fig.savefig("auroc_barplot.pdf", bbox_inches="tight", dpi=300)
+os.makedirs("figures", exist_ok=True)
+fig.savefig("figures/auroc_barplot.pdf", bbox_inches="tight", dpi=300)
 
 plt.show()
